@@ -15,7 +15,7 @@ public class PugRescueTester {
 			fillWithBreeds(breedList);
 
 			ArrayList<Dog> testSubjects = new ArrayList<Dog>();
-			final boolean EFFICIENCY = false;
+			final boolean EFFICIENCY = true;
 			//Set max to 10000000 for an efficiency check, or 100 for an accuracy check
 			int max = 0;
 			if (EFFICIENCY)
