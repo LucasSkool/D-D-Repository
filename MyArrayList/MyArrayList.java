@@ -18,46 +18,44 @@ public class MyArrayList<E> {
 	@SuppressWarnings("unchecked")
 	public MyArrayList() {
 		this.internalArray = (E[]) new Object[100];
+		objectCount = 0;
 	}
 
 	/* Constructor with initial capacity */
 	@SuppressWarnings("unchecked")
 	public MyArrayList(int initialCapacity) {
 		this.internalArray = (E[]) new Object[initialCapacity];
+		objectCount = 0;
 	}
 
 	/* Return the number of active slots in the array list */
 	public int size() {
-		return internalArray.length;
+		return objectCount;
 	}
 
 	/* Are there zero objects in the array list? */
 	public boolean isEmpty() {
-		for (int i = 0; i < internalArray.length; i++) {
-			if (internalArray[i] != null) {
-				return false;
-			}
-		}
-		return true;
+		return (objectCount <= 0);
 	}
 
 	/* Get the index-th object in the list. */
 	public E get(int index) {
-		if (index > internalArray.length - 1 || index < 0) {
-			throw new IndexOutOfBoundsException();
-		}
+    if (index < 0 || index >= objectCount) {
+        throw new IndexOutOfBoundsException();
+    }
 
-		return internalArray[index];
-	}
+    return internalArray[index];
+}
 
 	/* Replace the object at index with obj. returns object that was replaced. */
 	public E set(int index, E obj) {
-		if (index > internalArray.length - 1 || index < 0) {
+		if (index > objectCount - 1 || index < 0) {
 			throw new IndexOutOfBoundsException();
 		}
 
+		E oldObj = internalArray[index];
 		internalArray[index] = obj;
-		return obj;
+		return oldObj;
 	}
 
 	/*
@@ -65,7 +63,7 @@ public class MyArrayList<E> {
 	 * otherwise returns false.
 	 */
 	public boolean contains(E obj) {
-		for (int i = 0; i < internalArray.length; i++) {
+		for (int i = 0; i < objectCount; i++) {
 			if (internalArray[i].equals(obj)) {
 				return true;
 			}
@@ -76,50 +74,74 @@ public class MyArrayList<E> {
 	/* Insert an object at index */
 	@SuppressWarnings("unchecked")
 	public void add(int index, E obj) {
-		if (index > internalArray.length - 1 || index < 0) {
-			throw new IndexOutOfBoundsException("Cannot add obj to index not in list.");
+		if (index > objectCount || index < 0) {
+			throw new IndexOutOfBoundsException();
 		}
+		
+		if (objectCount == internalArray.length) {
+			E[] newArray = (E[]) new Object[internalArray.length * 2];
+			int internalArrayPos = 0;
+			boolean added = false;
+			for (int newArrayPos = 0; newArrayPos <= objectCount; newArrayPos++) { // goes through newArray
+				if (added == false && newArrayPos == index) {
+					newArray[index] = obj;
+					added = true;
+				} else {
+					newArray[newArrayPos] = internalArray[internalArrayPos];
+					internalArrayPos++;
+				}
+			}
+			internalArray = newArray;
 
-		E[] newArray = (E[]) new Object[internalArray.length + 1];
-		int newArrayPos = 0;
-		boolean added = false;
-		for (int internalArrayPos = 0; internalArrayPos < internalArray.length; internalArrayPos++) { // goes through
-			if (added == false && internalArrayPos == index) {
-				newArray[index] = obj;
-				newArrayPos++;
-				added = true;
-			} else {
-				newArray[newArrayPos] = internalArray[internalArrayPos];
-				newArrayPos++;
+		} else {
+			//go backwards through internalArray, once you reach the desired index, set it to obj
+			boolean added = false;
+
+			for (int internalArrayPos = objectCount; !added; internalArrayPos--) {
+				if (internalArrayPos == index) {
+					internalArray[internalArrayPos] = obj;
+					added = true;
+				} else {
+					internalArray[internalArrayPos] = internalArray[internalArrayPos - 1];
+				}
 			}
 		}
-		internalArray = newArray;
+
+		objectCount++;
+
+
 	}
 
 	/* Add an object to the end of the list; returns true */
 	@SuppressWarnings("unchecked")
 	public boolean add(E obj) {
-		E[] newArray = (E[]) new Object[internalArray.length + 1];
-		for (int i = 0; i < internalArray.length; i++) {
-			newArray[i] = internalArray[i];
+		if (objectCount == internalArray.length) {
+			E[] newArray = (E[]) new Object[internalArray.length * 2];
+			for (int i = 0; i < internalArray.length; i++) {
+				newArray[i] = internalArray[i];
+			}
+			newArray[objectCount] = obj;
+			internalArray = newArray;
+			
+		} else {
+			internalArray[objectCount] = obj;
 		}
-		newArray[newArray.length - 2] = obj;
-		internalArray = newArray;
+		objectCount++;
 		return true;
 	}
 
 	/* Remove the object at index and shift. Returns removed object. */
 	public E remove(int index) {
-		E[] newArray = (E[]) new Object[internalArray.length - 1];
-		E obj = null;
-		int newArrayPos = 0;
-		for (int internalArrayPos = 0; internalArrayPos < internalArray.length; internalArrayPos++) {
-			if (internalArrayPos != index) {
-				newArray[newArrayPos] = internalArray[internalArrayPos];
-				newArrayPos++;
-			}
+		if (index >= objectCount || index < 0) {
+			throw new IndexOutOfBoundsException();
 		}
-		internalArray = newArray;
+
+		E obj = internalArray[index];
+		for (int i = index; i < objectCount - 1; i++) {
+			internalArray[i] = internalArray[i + 1];
+		}
+		internalArray[objectCount - 1] = null;
+		objectCount--;
 		return obj;
 	}
 
@@ -132,18 +154,18 @@ public class MyArrayList<E> {
 	 * if this list changed as a result of the call).
 	 */
 	public boolean remove(E obj) {
-		E[] newArray = (E[]) new Object[internalArray.length - 1];
-		int newArrayPos = 0;
-		boolean removed = false;
-		for (int internalArrayPos = 0; internalArrayPos < internalArray.length; internalArrayPos++) { // go through
-			if (internalArray[internalArrayPos] != null && !internalArray[internalArrayPos].equals(obj)) {
-				newArray[newArrayPos] = internalArray[internalArrayPos];
-				newArrayPos++;
-				removed = true;
+		for (int i = 0; i < objectCount; i++) {
+			if (internalArray[i].equals(obj)) { //if we at the object, shift everything past to the left
+				for (int j = i; j < objectCount - 1; j++) {
+					internalArray[j] = internalArray[j + 1];
+				}
+				internalArray[objectCount - 1] = null;
+				objectCount--;
+				return true;
 			}
 		}
-		internalArray = newArray;
-		return removed;
+
+		return false;
 	}
 
 	/*
@@ -155,8 +177,8 @@ public class MyArrayList<E> {
 	 */
 	public String toString() {
 		String result = "[";
-		if (internalArray.length > 0) {
-			for (int i = 0; i < internalArray.length; i++) {
+		if (objectCount > 0) {
+			for (int i = 0; i < objectCount; i++) {
 				result += internalArray[i] + ", ";
 			}
 			result = result.substring(0, result.length() - 2) + "]";
