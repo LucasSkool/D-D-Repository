@@ -31,10 +31,6 @@ public class MyArrayList<E> {
 		objectCount = 0;
 	}
 
-	public void artificallySubtractObjectCount(int amountToSubtract) {
-		this.objectCount -= amountToSubtract;
-	}
-
 	/* Return the number of active slots in the array list */
 	public int size() {
 		return objectCount;
