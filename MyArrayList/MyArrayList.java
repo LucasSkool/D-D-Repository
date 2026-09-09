@@ -24,8 +24,15 @@ public class MyArrayList<E> {
 	/* Constructor with initial capacity */
 	@SuppressWarnings("unchecked")
 	public MyArrayList(int initialCapacity) {
+		if (initialCapacity <= 0) {
+			throw new IllegalArgumentException("Initial capacity must be a positive integer.");
+		}
 		this.internalArray = (E[]) new Object[initialCapacity];
 		objectCount = 0;
+	}
+
+	public void artificallySubtractObjectCount(int amountToSubtract) {
+		this.objectCount -= amountToSubtract;
 	}
 
 	/* Return the number of active slots in the array list */
@@ -176,16 +183,21 @@ public class MyArrayList<E> {
 	 * Elements are separated by a comma and a space.
 	 */
 	public String toString() {
-		String result = "[";
-		if (objectCount > 0) {
-			for (int i = 0; i < objectCount; i++) {
-				result += internalArray[i] + ", ";
+		StringBuilder result = new StringBuilder((objectCount - 1) * 3 + 3);
+		result.append("[");
+		for (int i = 0; i < objectCount; i++) {
+			if (i == objectCount - 1) {
+				result.append(internalArray[i]);
+			} else {
+				result.append(internalArray[i] + ", ");
 			}
-			result = result.substring(0, result.length() - 2) + "]";
-		} else {
-			result = "[]";
 		}
-		return result;
+		result.append("]");
+		return result.toString();
+	}
+
+	public void clear() {
+		objectCount = 0;
 	}
 
 }
