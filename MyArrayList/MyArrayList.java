@@ -196,4 +196,33 @@ public class MyArrayList<E> {
 		objectCount = 0;
 	}
 
+	public void removeAll(E obj) {
+		int internalArrayPos = 0;
+		int whereIAmLooking = 0; 
+		int removedObjects = 0;
+		for (int i = 0; i < objectCount; i++) {
+			if (!internalArray[whereIAmLooking].equals(obj)) { //if I am not looking at the obj
+				internalArray[internalArrayPos] = internalArray[whereIAmLooking];
+				internalArrayPos++;
+				whereIAmLooking++;
+				
+			} else { //if I am looking at an obj
+				whereIAmLooking++;
+				removedObjects++;
+			}
+		}
+		objectCount -= removedObjects;
+	}
+	//	
+	// even, odd, odd, even, odd, even, even, odd, odd, even,.
+
+	public int indexOf(E obj) {
+		for (int i = 0; i < objectCount; i++) {
+			if (internalArray[i].equals(obj)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 }

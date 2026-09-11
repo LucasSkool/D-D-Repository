@@ -31,7 +31,7 @@ public class MyArrayListTester {
          * System.out.println(list.toString());
          */
 
-        MyArrayList<Dog> list = new MyArrayList<Dog>();
+        /* MyArrayList<Dog> list = new MyArrayList<Dog>();
         int numThings = 50;
 
         for (int i = 0; i < numThings; i++) {
@@ -60,7 +60,25 @@ public class MyArrayListTester {
             }
         }
 
+        System.out.println(list.toString()); */
+
+        MyArrayList<String> list = new MyArrayList<String>();
+
+        for (int i = 0; i < 15; i++) {
+            if (i % 2 == 0) {
+                list.add("odd");
+            } else {
+                list.add("even");
+            }
+        }
+
         System.out.println(list.toString());
+
+        list.removeAll("odd");
+
+        System.out.println(list.toString());
+
+
 
     }
 }
