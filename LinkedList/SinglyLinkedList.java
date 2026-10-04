@@ -18,29 +18,33 @@ public class SinglyLinkedList<E> {
 	// Constructor: creates a list that contains
 	// all elements from the array values, in the same order
 	public SinglyLinkedList(E[] values) {
-		if (values.length < 1) {
-			throw new IllegalArgumentException();
+		if (values.length < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		if (values.length == 0) {
+			return;
 		}
 
 		if (values.length == 1) {
-			this.head = new ListNode<E>(values[0], null);
+			this.head = new ListNode<E>(values[0], this.tail);
+			return;
 		}
 
 		if (values.length == 2) {
 			this.tail = new ListNode<E>(values[1], null);
 			this.head = new ListNode<E>(values[0], this.tail);
+			return;
 		}
 		
-		for (int i = values.length - 1; i >= 0; i--) { // backwards through array
-			if (i == values.length - 1) {
-				this.tail = new ListNode<E>(values[i], null);
-			}
-
-			if (i == 0) {
-				this.head = new ListNode<E>(values[i], )
-			}
+		this.tail = new ListNode<E>(values[values.length - 1], null); //tail only
+		ListNode<E> prevNode = this.tail;
+		for (int i = values.length - 2; i > 0; i--) {
+			ListNode<E> newNode = new ListNode<E>(values[i], prevNode);
+			prevNode = newNode;
 			
 		}
+		this.head = new ListNode<E>(values[0], prevNode);
 	}
 
 	public ListNode<E> getHead() {
@@ -83,19 +87,19 @@ public class SinglyLinkedList<E> {
 			return false;
 		}
 		if (this.head != null && this.tail == null) {
-			if (!this.head.getValue().equals(obj)) {
+			if (!(obj == null ? this.head.getValue() == null : obj.equals(this.head.getValue()))) {
 				return false;
 			}
 			return true;
 		}
 
-		if (this.head.getValue().equals(obj)) {
+		if (obj == null ? this.head.getValue() == null : obj.equals(this.head.getValue())) { //if the head is the obj
 			return true;
 		}
 		
 		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != null; nodeInQuestion = nodeInQuestion
 				.getNext()) {
-			if (nodeInQuestion.getValue().equals(obj)) {
+			if (obj == null ? nodeInQuestion.getValue() == null : obj.equals(nodeInQuestion.getValue())) {
 				return true;
 			}
 		}
@@ -105,15 +109,19 @@ public class SinglyLinkedList<E> {
 	// Returns the index of the first element in equal to obj;
 	// if not found, returns -1.
 	public int indexOf(E obj) {
+		if (this.head == null || (this.head != null && this.tail == null && !(obj == null ? this.head.getValue() == null : obj.equals(this.head.getValue())))) {
+			return -1;
+		}
+		
 		int index = 0;
-		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != this.tail; nodeInQuestion = nodeInQuestion
-				.getNext()) {
-			if (nodeInQuestion.getValue().equals(obj)) {
+		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != null; nodeInQuestion = nodeInQuestion.getNext()) {
+			if (obj == null ? nodeInQuestion.getValue() == null : obj.equals(nodeInQuestion.getValue())) {
 				return index;
 			}
 			index++;
 		}
-		return index;
+		
+		return -1;
 	}
 
 	// Adds obj to this collection. Returns true if successful;
@@ -142,21 +150,35 @@ public class SinglyLinkedList<E> {
 			return false;
 		}
 
-		if (this.head != null && this.tail == null) {
-			if (!this.head.equals(obj)) {
+		if (this.head != null && this.tail == null) { //if there is only one value
+			if (!(obj == null ? this.head.getValue() == null : obj.equals(this.head.getValue()))) { //if the only object in the list is not the obj we are looking for
 				return false;
 			}
-			this.tail = null;
+			//else / if the only object IS the obj we are looking for...
+			this.head = null;
 			return true;
 		}
 
-		if (this.head.equals(obj)) {
+		if (obj == null ? this.head.getValue() == null : obj.equals(this.head.getValue())) {
 			this.head = this.head.getNext();
+
+			if (this.head == null) {
+				this.tail = null;
+			}
+
+			return true;
 		}
 		
-		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != this.tail; nodeInQuestion = nodeInQuestion.getNext()) {
-			if (nodeInQuestion.getNext().getValue().equals(obj)) {
-				nodeInQuestion.setNext(nodeInQuestion.getNext().getNext());
+		for (ListNode<E> previousNode = this.head; previousNode != this.tail; previousNode = previousNode.getNext()) {
+			if ((obj == null ? previousNode.getNext().getValue() == null : obj.equals(previousNode.getNext().getValue()))
+        && previousNode.getNext().equals(this.tail)) {
+				previousNode.setNext(previousNode.getNext().getNext());
+				this.tail = previousNode;
+				return true;
+			} //does this work?? idk..
+			
+			if (obj == null ? previousNode.getNext().getValue() == null : obj.equals(previousNode.getNext().getValue())) {
+				previousNode.setNext(previousNode.getNext().getNext());
 				return true;
 			}
 		}
@@ -167,7 +189,7 @@ public class SinglyLinkedList<E> {
 	// Returns the i-th element.
 	public E get(int i) {
 		int index = 0;
-		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != this.tail; nodeInQuestion = nodeInQuestion
+		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != null; nodeInQuestion = nodeInQuestion
 				.getNext()) {
 			if (index == i) {
 				return nodeInQuestion.getValue();
@@ -179,12 +201,18 @@ public class SinglyLinkedList<E> {
 
 	// Replaces the i-th element with obj and returns the old value.
 	public E set(int i, E obj) {
-		if (i == this.size() - 1) {
-			this.getTail().setValue(obj);
+		if (this.head == null) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		if (this.head != null && this.tail == null && i == 0) {
+			E removed = this.head.getValue();
+			this.head.setValue(obj);
+			return removed;
 		}
 
 		int index = 0;
-		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != this.tail; nodeInQuestion = nodeInQuestion
+		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != null; nodeInQuestion = nodeInQuestion
 				.getNext()) {
 			if (index == i) { // if we at the index
 				E removed = nodeInQuestion.getValue();
@@ -194,27 +222,55 @@ public class SinglyLinkedList<E> {
 			index++;
 		}
 
-		throw new IndexOutOfBoundsException(); // must be out of bounds.
+		throw new IndexOutOfBoundsException(); // must be out of bounds by this point
 	}
 
 	// Inserts obj to become the i-th element. Increments the size
 	// of the list by one.
 	public void add(int i, E obj) {
-		if ((i < 0 || i >= this.size()) || (this.head == null) || (this.head != null && this.tail == null && i == 0)) {
+		if ((i < 0 || i > this.size())) {
 			throw new IndexOutOfBoundsException();
 		}
 
-		if (i == 0) {
-			this.head = new ListNode<E>(obj, this.getHead());
+		if (this.head == null) { //if empty, i has to be 0
+			this.head = new ListNode<E>(obj, tail);
+			return;
 		}
+
+		if (this.head != null && this.tail == null) { //if only 1, i has to be either 0 or 1
+			if (i == 0) {
+				this.tail = new ListNode<E>(this.head.getValue(), null);
+				this.head.setValue(obj);
+				this.head.setNext(this.tail);
+				return;
+			}
+			if (i == 1) {
+				this.tail = new ListNode<E>(obj, null);
+				this.head.setNext(this.tail);
+				return;
+			}
+		}
+		
+		if (i == 0) {
+			this.head = new ListNode<E>(obj, this.head);
+			return;
+		}
+
+		if (i == this.size()) {
+			this.add(obj);
+			return;
+		}
+
+		//okay all the "edge" cases kind of out of the way
 
 		int index = 1;
 		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != this.tail; nodeInQuestion = nodeInQuestion.getNext()) {
+			//nodeInQuestion is actually 1 index behind all the time
 			if (index == i) {
 				ListNode<E> newNode = new ListNode<E>(obj, nodeInQuestion.getNext());
 				nodeInQuestion.setNext(newNode);
+				return;
 			}
-			
 			index++;
 		}
 	}
@@ -225,32 +281,38 @@ public class SinglyLinkedList<E> {
 		if ((i < 0 || i >= this.size()) || (this.head == null) || (this.head != null && this.tail == null && i != 0)) {
 			throw new IndexOutOfBoundsException();
 		}
-		
-		/*if (this.head == null) { //if completely empty
-			throw new IndexOutOfBoundsException();
-		}
-
-		if (this.head != null && this.tail == null && i != 0) { //if size 1
-			throw new IndexOutOfBoundsException();
-		} */ //These are combined in the first if statement for index out of bounds
 
 		if (i == 0) { //if we want to remove the first one
 			E removed = this.head.getValue();
 			this.head = this.head.getNext();
+
+			if (this.head == null) {
+				this.tail = null;
+			}
+
 			return removed;
 		}
-		int index = 1;
 
+		int index = 1;
 		E removed = null;
-		for (ListNode<E> nodeInQuestion = this.head; nodeInQuestion != this.tail; nodeInQuestion = nodeInQuestion.getNext()) {
+		boolean foundObject = false;
+		for (ListNode<E> previousNode = this.head; previousNode != this.tail && !foundObject; previousNode = previousNode.getNext()) {
+			if (index == i && previousNode.getNext().equals(this.tail)) {
+			removed = previousNode.getNext().getValue();
+			previousNode.setNext(null);
+			this.tail = previousNode;
+			return removed;
+			} //idk if the last line of code does what I want.
+			
 			if (index == i) {
-				removed = nodeInQuestion.getNext().getValue();
-				nodeInQuestion.setNext(nodeInQuestion.getNext().getNext());
-				nodeInQuestion = this.tail; //hitting the skip button
+				removed = previousNode.getNext().getValue();
+				previousNode.setNext(previousNode.getNext().getNext());
+				foundObject = true;
+				return removed;
 			}
 			index++;
 		}
-		return removed;
+		throw new IllegalArgumentException("No cases in the method code were met.");
 	}
 
 	// Returns a string representation of this list exactly like that for
