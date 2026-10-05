@@ -19,7 +19,8 @@ public class TeletextList {
   public TeletextList(String[] headlines) {
     this.heading = new ListNode2("Today's headlines:", null, null);
     this.heading.setPrevious(new ListNode2("", null, this.heading));
-    this.heading.setNext(new ListNode2("", this.heading, null));
+    this.heading.setNext(new ListNode2("", this.heading, this.heading.getPrevious()));
+    //this.heading.getPrevious().setPrevious(this.heading.getNext());
 
     ListNode2 previousNode = this.heading.getNext();
     for (int i = 0; i < headlines.length; i++) {
@@ -29,6 +30,7 @@ public class TeletextList {
     }
 
     previousNode.setNext(this.heading.getPrevious());
+    this.heading.getPrevious().setPrevious(previousNode);
     this.topNode = this.heading;
   }
 
@@ -51,7 +53,7 @@ public class TeletextList {
     if (!(topNode.getNext().equals(this.heading) || topNode.getNext().equals(this.heading.getNext()) || topNode.getNext().equals(this.heading.getPrevious()))) {
 
       topNode.setNext(topNode.getNext().getNext());
-      topNode.getNext().getNext().setPrevious(topNode);
+      topNode.getNext().setPrevious(topNode);
 
     }
   }
@@ -70,7 +72,7 @@ public class TeletextList {
   private ListNode2 addBefore(ListNode2 node, String msg) {
     ListNode2 newNode = new ListNode2(msg, node.getPrevious(), node);
     node.setPrevious(newNode);
-    node.getPrevious().getPrevious().setNext(node.getPrevious());
+    newNode.getPrevious().setNext(newNode);
     return newNode;
   }
 
@@ -81,7 +83,7 @@ public class TeletextList {
   private ListNode2 addAfter(ListNode2 node, String msg) {
     ListNode2 newNode = new ListNode2(msg, node, node.getNext());
     node.setNext(newNode);
-    node.getNext().getNext().setPrevious(newNode);
+    newNode.getNext().setPrevious(newNode);
     return newNode;
   }
 
