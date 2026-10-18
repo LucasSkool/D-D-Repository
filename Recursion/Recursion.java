@@ -19,22 +19,24 @@ public class Recursion {
 	// Trying to infect outside the confines of the grid also has no effect
 	// Precondition: grid has no null entries
 	public static void infect(String[][] grid, int r, int c) {
-		if (grid[r][c].equals("vaccinated")) { return; }
-		//base case, virus stops at vaccinated ppl
-		
-		//if they are not vaccinated:
+		if (grid[r][c].equals("vaccinated")) {
+			return;
+		}
+		// base case, virus stops at vaccinated ppl
+
+		// if they are not vaccinated:
 		grid[r][c] = "infected";
 
-		if (r - 1 >= 0 && !grid[r-1][c].equals("infected")) {
+		if (r - 1 >= 0 && !grid[r - 1][c].equals("infected")) {
 			infect(grid, r - 1, c);
 		}
-		if (r + 1 < grid.length && !grid[r+1][c].equals("infected")) {
+		if (r + 1 < grid.length && !grid[r + 1][c].equals("infected")) {
 			infect(grid, r + 1, c);
 		}
-		if (c - 1 >= 0 && !grid[r][c-1].equals("infected")) {
+		if (c - 1 >= 0 && !grid[r][c - 1].equals("infected")) {
 			infect(grid, r, c - 1);
 		}
-		if (c + 1 < grid[0].length && !grid[r][c+1].equals("infected")) {
+		if (c + 1 < grid[0].length && !grid[r][c + 1].equals("infected")) {
 			infect(grid, r, c + 1);
 		}
 
@@ -62,9 +64,11 @@ public class Recursion {
 	// Jumping 1-1-2 is considered different than jumping 1-2-1
 	// Precondition: n > 0
 	public static long countWaysToJumpUpStairs(int n) {
-		/*if (n == 0) {
-			return 0;
-		}*/ //precondition eliminates ts possibility
+		/*
+		 * if (n == 0) {
+		 * return 0;
+		 * }
+		 */ // precondition eliminates ts possibility
 		if (n == 1) {
 			return 1;
 		}
@@ -75,11 +79,12 @@ public class Recursion {
 			return 4;
 		}
 		return countWaysToJumpUpStairs(n - 1) + countWaysToJumpUpStairs(n - 2) + countWaysToJumpUpStairs(n - 3);
-		//each 3 of the recursive recalls already accounts for each of the 3 step possibilities.. ohhhhh
+		// each 3 of the recursive recalls already accounts for each of the 3 step
+		// possibilities.. ohhhhh
 	}
 
 	// Everything above this line does NOT require a recursive helper method
-	// ----------------------------------
+	// --------------------------------------------------------------------
 	// Everything below this line requires a recursive helper method
 	// Any recursive helper method you write MUST have a comment describing:
 	// 1) what the helper method does/returns
@@ -90,9 +95,31 @@ public class Recursion {
 	// For example, subsets("abc") would print out "", "a", "b", "c", "ab", "ac",
 	// "bc", "abc"
 	// Order is your choice
-	public static void printSubsets(String str) {
 
+	//Logic: A given string's subsets are composed of the very last
+	//character added on to the subsets of the same string without that last character
+	//so I need a way to give something a string and a character to add? I think..
+	public static void printSubsets(String str) {
+		printSubsets(str, "");
 	}
+
+	// str = characters remaining to consider
+	// current = subset constructed so far
+
+	//a in this subset? no/yes. b in this subset? no/yes. c in this subset? no/yes --> all possible subsets @ end..
+	public static void printSubsets(String str, String current) {
+		if (str.length() == 0) {
+			System.out.println(current);
+			return;
+		}
+
+		printSubsets(str.substring(0, str.length() - 1), current);
+		printSubsets(str.substring(0, str.length() - 1), current + str.charAt(str.length() - 1));
+	}
+
+	// abcd
+	// "" --> "a" "b" "c" "d" --> "ab" "bc" "cd" --> "abc" "bcd" --> "abcd"
+	// 1, 4, 3, 2, 1
 
 	// List contains a single String to start.
 	// Prints all the permutations of str on separate lines
@@ -107,7 +134,52 @@ public class Recursion {
 	// Performs a mergeSort on the given array of ints
 	// Precondition: you may assume there are NO duplicates!!!
 	public static void mergeSort(int[] ints) {
+		mergeSort(ints, 0, ints.length - 1);
+	}
 
+	public static void mergeSort(int[] ints, int left, int right) { //inclusive
+		if (left >= right) {
+    		return;
+		} //like when we are basically at 1 in the array or below
+
+		int mid = left + (right - left) / 2;
+		mergeSort(ints, left, mid);
+		mergeSort(ints, mid + 1, right);
+
+		//merge the two halves...
+		int[] temp = new int[right - left + 1];
+
+		int i = left;
+		int j = mid + 1;
+		int k = 0;
+
+		while (i <= mid && j <= right) { //putting everything into a temp array
+			if (ints[i] < ints[j]) {
+				temp[k] = ints[i];
+				i++;
+			} else {
+				temp[k] = ints[j];
+				j++;
+			}
+			k++;
+    	}
+
+		while (i <= mid) { //whateva is left
+			temp[k] = ints[i];
+			i++;
+			k++;
+		}
+
+		while (j <= right) {
+			temp[k] = ints[j];
+			j++;
+			k++;
+		}
+
+		for (int x = 0; x < temp.length; x++) {
+			ints[left + x] = temp[x];
+		} //setting ints to el temp
+		
 	}
 
 	// Performs a quickSort on the given array of ints

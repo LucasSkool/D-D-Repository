@@ -56,5 +56,8 @@ public class RecursionTester {
         Recursion.infect(losAngeles, 2, 2);
         System.out.println(toString(losAngeles));
 
+        System.out.println();
+        Recursion.printSubsets("abcd");
+
     }
 }
